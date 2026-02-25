@@ -1,5 +1,4 @@
 .venv/
 *.csv
 wandb/
-chroma_db/
 *.json
