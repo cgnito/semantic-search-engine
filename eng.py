@@ -25,7 +25,7 @@ model, chroma_client = get_resources()
 def build_db_if_needed():
     collection = chroma_client.get_or_create_collection(name=COLLECTION_NAME)
 
-    # Check if the collection is empty
+    # check if the collection is empty
     if collection.count() == 0:
         st.info("First time setup. Starting the embedding process...")
 
@@ -62,7 +62,7 @@ def build_db_if_needed():
                 
                 current_texts, current_metadatas = [], []
 
-        # Handle leftovers
+        # handle leftovers
         if current_texts:
             embeddings = model.encode(current_texts).tolist()
             ids = [f"id_{i}" for i in range(count, count + len(current_texts))]
@@ -77,7 +77,6 @@ def build_db_if_needed():
     
     return collection
 
-# Simply call it now
 collection = build_db_if_needed()
 
 st.title("Abdulrahmon's Tweets Semantic Search")
