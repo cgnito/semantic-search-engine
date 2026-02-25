@@ -1,5 +1,5 @@
-pandas
-sentence_transformers
-chromadb
-ijson
 streamlit
+chromadb
+sentence-transformers
+ijson
+pysqlite3-binary
