@@ -80,7 +80,8 @@ def build_db_if_needed():
 collection = build_db_if_needed()
 
 # ui components
-st.title("Abdulrahmon's Tweets Semantic Search")
+st.title("Abdulrahmon Tweet Explorer")
+st.markdown("Find tweets by meaning, not just keywords.")
 
 user_query = st.text_input("Search Abdul's tweets:", placeholder="e.g., coding tips, football, startup life...")
 
