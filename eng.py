@@ -79,8 +79,8 @@ def build_db_if_needed():
 
 collection = build_db_if_needed()
 
+# ui components
 st.title("Abdulrahmon's Tweets Semantic Search")
-st.markdown("Enter a topic or phrase to search through my tweet history using AI.")
 
 user_query = st.text_input("Search Abdul's tweets:", placeholder="e.g., coding tips, football, startup life...")
 
@@ -98,3 +98,34 @@ if user_query:
                     st.write(tweet)
         else:
             st.warning("No matches found. Try a different search term.")
+
+st.markdown("""
+### 🔎 How It Works
+
+This search engine doesn't just look for exact keyword matches.  
+It understands *meaning*.
+
+Each tweet in my archive was converted into a numerical representation called an **embedding** using a language model.  
+Embeddings capture the semantic meaning of text — so similar ideas are placed close together in vector space.
+
+When you enter a query:
+
+1. Your search phrase is converted into an embedding.
+2. The system compares it to all tweet embeddings.
+3. It finds the closest matches using vector similarity (cosine similarity).
+4. The most semantically relevant tweets are returned — even if they don’t contain the exact words you typed.
+
+This allows you to search by **ideas, themes, and intent**, not just keywords.
+
+Try searching for concepts like:
+- curiosity
+- discipline
+- building
+- philosophy
+- learning systems
+
+---
+
+Built by **Abdulrahmon Adebayo**  
+[Follow me on X](https://x.com/yourusername)
+""")
