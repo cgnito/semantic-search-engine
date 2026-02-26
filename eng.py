@@ -127,5 +127,5 @@ Try searching for concepts like:
 ---
 
 Built by **Abdulrahmon Adebayo**  
-[Follow me on X](https://x.com/yourusername)
+[Follow me on X](https://x.com/cgnito)
 """)
