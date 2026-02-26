@@ -20,20 +20,30 @@ Most search engines look for exact words. This app uses **Machine Learning** to 
 
 ## ⚙️ Setup & Installation
 
-1. **Clone the repo:**
-   ```bash
-  git clone https://github.com/cgnito/semantic-search-engine.git
-  cd semantic-search-engine
-2. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-3. **Run the app:**
-   ```bash
-   streamlit run eng.py   
-## Future Improvements, hopefully
+### Clone the Repository
 
-- [ ] **Incremental Sync:** Update the logic to only embed new tweets instead of re-indexing the whole file if it's missing.
-- [ ] **Media Preview:** Enhance metadata to include image links or video thumbnails from the tweets.
+```bash
+git clone https://github.com/cgnito/semantic-search-engine.git
+cd semantic-search-engine
+```
+### Install Dependencies
+```bash
+pip install -r requirements.txt
+```
+### Run the App
+```bash
+streamlit run eng.py
+```
+---
+
+## Future Improvements
+
+- [ ] **Incremental Sync:** Update the logic to embed only new tweets instead of re-indexing the entire dataset when embeddings are missing.
+
+- [ ] **Media Preview:** Enhance metadata to include image URLs or video thumbnails from tweets.
+
 - [ ] **Advanced Filtering:** Add a sidebar UI to filter results by year, month, or tweet length.
-- [ ] **Topic Clustering:** Use Unsupervised Learning (K-Means) to automatically group tweets into categories like "Tech," "Life," or "Sports."
-- [ ] **X API Integration:** Move away from manual JSON uploads and allow users to login with X to search their own timeline in real-time.
+
+- [ ] **Topic Clustering:** Use unsupervised learning (e.g., K-Means) to automatically group tweets into categories such as "Tech," "Life," or "Sports."
+
+- [ ] **X API Integration:** Replace manual JSON uploads with real-time authentication using the X API, allowing users to search their own timelines.
