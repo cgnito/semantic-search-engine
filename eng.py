@@ -81,7 +81,7 @@ collection = build_db_if_needed()
 
 # ui components
 st.title("Abdulrahmon Tweet Explorer")
-st.markdown("Find tweets by meaning, not just keywords.")
+st.markdown("Find tweets by topics or intent, not just keywords.")
 
 user_query = st.text_input("Search Abdul's tweets:", placeholder="e.g., coding tips, football, startup life...")
 
@@ -104,9 +104,9 @@ st.markdown("""
 ### 🔎 How It Works
 
 This search engine doesn't just look for exact keyword matches.  
-It understands *meaning*.
+It understands *meaning and intent*.
 
-Each tweet in my archive was converted into a numerical representation called an **embedding** using a language model.  
+Each tweet in my archive was converted into a numerical representation called an **embedding** using a model.  
 Embeddings capture the semantic meaning of text — so similar ideas are placed close together in vector space.
 
 When you enter a query:
