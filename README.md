@@ -22,8 +22,8 @@ Most search engines look for exact words. This app uses **Machine Learning** to 
 
 1. **Clone the repo:**
    ```bash
-   git clone [https://github.com/cgnito/semantic-search-engine.git](https://github.com/cgnito/semantic-search-engine.git)
-   cd semantic-search-engine
+  git clone https://github.com/cgnito/semantic-search-engine.git
+  cd semantic-search-engine
 2. **Install dependencies:**
    ```bash
    pip install -r requirements.txt
