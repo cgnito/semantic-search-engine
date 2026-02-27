@@ -107,14 +107,14 @@ This search engine doesn't just look for exact keyword matches.
 It understands *meaning and intent*.
 
 Each tweet in my archive was converted into a numerical representation called an **embedding** using a model.  
-Embeddings capture the semantic meaning of text — so similar ideas are placed close together in vector space.
+Embeddings capture the semantic meaning of text, so similar ideas are placed close together in vector space.
 
 When you enter a query:
 
 1. Your search phrase is converted into an embedding.
 2. The system compares it to all tweet embeddings.
 3. It finds the closest matches using vector similarity (cosine similarity).
-4. The most semantically relevant tweets are returned — even if they don’t contain the exact words you typed.
+4. The most semantically relevant tweets are returned, even if they don’t contain the exact words you typed.
 
 This allows you to search by **ideas, themes, and intent**, not just keywords.
 
