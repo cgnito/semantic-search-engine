@@ -1,49 +1,67 @@
-## 🐦 Abdulrahmon's Tweet Semantic Search Engine
+# 🐦 abdulrahmon's tweet semantic search engine
 
-An AI-powered search tool that allows you to search through my Twitter history using **meanings** rather than just keywords. Unlike "standard" twitter search, this engine understands context—searching e.g "coding" will find tweets about Python, JavaScript, or debugging even if the word "coding" isn't in the tweet.
+this engine implements a vector-based retrieval system that performs asymmetric semantic search across a local twitter archive using sentence-level embeddings. unlike traditional inverted-index keyword searches, this system utilizes a transformer-based encoder to map tweets and queries into a shared 384-dimensional dense vector space, enabling discovery based on latent topical similarity and intent.
 
-### Simple Explanation
-Most search engines look for exact words. This app uses **Machine Learning** to turn my tweets into mathematical "vectors" (embeddings). When you type a query, the app calculates which tweets are mathematically closest to the meaning of your search and shows you the top 10 matches instantly.
+### what it does (simply put)
 
-### The Stack
-* **UI Framework:** [Streamlit](https://streamlit.io/) for a responsive, Python-based web interface.
-* **Vector Database:** [ChromaDB](https://www.trychroma.com/) (Persistent) to store and query embeddings locally.
-* **Embedding Model:** `all-MiniLM-L6-v2` via **Sentence-Transformers**. It's a lightweight yet powerful model that converts text into 384-dimensional vectors.
-* **Data Processing:** `ijson` for iterative JSON parsing, allowing the app to handle large Twitter archives without crashing the system's RAM.
+most search engines just match words. this app uses **machine learning** to convert tweets into numerical "embeddings." when you search for a concept like "productivity," the system calculates which tweets are mathematically closest to that idea, even if they don't contain the specific word "productivity."
 
-### How it Works
-1.  **Ingestion:** The app reads the raw `tweets.json` using a generator to keep memory usage low.
-2.  **Vectorization:** Tweets are processed in batches of 256. The model generates embeddings for each batch.
-3.  **Storage:** ChromaDB stores the text, metadata (date), and the vector.
-4.  **Semantic Querying:** When a user enters a query, the search term is vectorized using the same model, and a **Cosine Similarity** search is performed against the database.
-5.  **Caching:** Uses `@st.cache_resource` to keep the 100MB+ AI model in memory, ensuring search results appear in milliseconds.
+### the stack
 
-## ⚙️ Setup & Installation
+- **ui framework:** streamlit for an interactive, reactive python web interface.
 
-### Clone the Repository
+- **vector database:** chromadb for persistent storage and fast nearest-neighbor (knn) lookups.
+
+- **embedding model:** `all-minilm-l6-v2` via sentence-transformers (sbert), providing high-quality semantic mapping at low latency.
+
+- **data processing:** ijson for iterative json parsing to handle large archives with minimal memory overhead.
+
+### how it works
+
+1. memory-efficient ingestion: the app streams the `tweets.json` archive using a generator, ensuring the system doesn't crash regardless of archive size.
+
+2. vectorization: tweets are processed in batches of 256. the sbert model encodes each tweet into a vector representing its semantic meaning.
+
+3. local storage: chromadb stores the document text, date metadata, and the high-dimensional vectors.
+
+4. semantic retrieval: user queries are encoded on-the-fly, and a cosine similarity search is performed against the database to find the top 10 most relevant matches.
+
+5. sqlite compatibility: uses a `pysqlite3` injection to ensure compatibility with modern chromadb requirements in various environments.
+
+### setup & installation
 
 ```bash
+# clone the repository
 git clone https://github.com/cgnito/semantic-search-engine.git
 cd semantic-search-engine
 ```
-### Install Dependencies
+
 ```bash
+#create a virtual environment
+python -m venv venv
+source venv/bin/activate  # on windows: venv\scripts\activate
+```
+
+```bash
+# install dependencies
 pip install -r requirements.txt
 ```
-### Run the App
+
 ```bash
+# run the app
 streamlit run eng.py
 ```
+
+### future improvements
+
+- better ui: transition to a more polished, custom-branded interface.
+
+- api-based embeddings: moving to cloud-hosted embedding apis for higher dimensionality and improved retrieval quality.
+
+- proper top-k search tuning: refining retrieval parameters for better precision and recall.
+
+- live tweet indexing: replacing the static json archive with real-time x api integration.
+
 ---
 
-## Future Improvements
-
-- [ ] **Incremental Sync:** Update the logic to embed only new tweets instead of re-indexing the entire dataset when embeddings are missing.
-
-- [ ] **Media Preview:** Enhance metadata to include image URLs or video thumbnails from tweets.
-
-- [ ] **Advanced Filtering:** Add a sidebar UI to filter results by year, month, or tweet length.
-
-- [ ] **Topic Clustering:** Use unsupervised learning (e.g., K-Means) to automatically group tweets into categories such as "Tech," "Life," or "Sports."
-
-- [ ] **X API Integration:** Replace manual JSON uploads with real-time authentication using the X API, allowing users to search their own timelines.
+this is just an mvp of a bigger idea... more soon.
