@@ -1,7 +1,7 @@
 fastapi
 uvicorn[standard]
 pydantic
-chromadb
-sentence-transformers
+pinecone
 ijson
 python-dotenv
+#sentence-transformers -- if you wanna run localy to first setup your embeddings, had to remove cause of vercel's limit
