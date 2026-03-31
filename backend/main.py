@@ -58,12 +58,12 @@ async def force_ingest():
             })
             count += 1
             if len(current_batch) >= batch_size:
-                index.upsert(vectors=current_batch)
+                index.upsert(vectors=current_batch, user_id="manual_ingest")
                 current_batch = []
                 print(f"Uploaded {count} tweets...")
 
         if current_batch:
-            index.upsert(vectors=current_batch)
+            index.upsert(vectors=current_batch, user_id="manual_ingest")
             
         return {"status": "success", "tweets_uploaded": count}
     except Exception as e:
