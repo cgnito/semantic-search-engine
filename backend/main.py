@@ -32,6 +32,7 @@ def tweet_generator():
     with open(file_path, "r", encoding="utf-8") as f:
         for record in ijson.items(f, "item"):
             yield {
+                "id": record["tweet"]["id_str"],
                 "text": record["tweet"]["full_text"],
                 "date": record["tweet"]["created_at"]
             }
@@ -49,21 +50,20 @@ async def force_ingest():
         print("Starting manual ingestion...")
         
         for tweet_data in tweet_generator():
+        
             current_batch.append({
-                "id": f"tweet_{count}",
-                "metadata": {
-                    "text": tweet_data["text"],
-                    "date": tweet_data["date"]
-                }
+                "id": tweet_data["id"],
+                "text": tweet_data["text"],
+                "date": tweet_data["date"]
             })
             count += 1
             if len(current_batch) >= batch_size:
-                index.upsert(vectors=current_batch, user_id="manual_ingest")
+                index.upsert_records(namespace="tweets", records=current_batch)
                 current_batch = []
                 print(f"Uploaded {count} tweets...")
 
         if current_batch:
-            index.upsert(vectors=current_batch, user_id="manual_ingest")
+            index.upsert_records(namespace="tweets", records=current_batch)
             
         return {"status": "success", "tweets_uploaded": count}
     except Exception as e:
@@ -72,16 +72,19 @@ async def force_ingest():
 
 @app.post("/search")
 async def search(request: QueryRequest):
-    results = index.query(
-        top_k=10,
-        include_metadata=True,
-        inputs={"text": request.query} 
+
+    results = index.search(
+        namespace="tweets",
+        query={
+            "inputs": {"text": request.query},
+            "top_k": 10
+        }
     )
     
     return [
         {
-            "text": match["metadata"]["text"],
-            "date": match["metadata"]["date"]
+            "text": hit["fields"]["text"],
+            "date": hit["fields"]["date"]
         }
-        for match in results["matches"]
+        for hit in results["result"]["hits"]
     ]
