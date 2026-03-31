@@ -28,6 +28,7 @@ class QueryRequest(BaseModel):
 def tweet_generator():
     file_path = "tweets.json"
     if not os.path.exists(file_path):
+        print(f"Error: {file_path} not found in {os.getcwd()}")
         return
     with open(file_path, "r", encoding="utf-8") as f:
         for record in ijson.items(f, "item"):
@@ -36,30 +37,40 @@ def tweet_generator():
                 "date": record["tweet"]["created_at"]
             }
 
-@app.on_event("startup")
-async def startup_event():
+@app.get("/")
+def health_check():
+    return {"status": "online", "message": "Search engine is live"}
+
+@app.get("/force-ingest")
+async def force_ingest():
+    """Manual trigger to upload tweets if the startup event failed."""
+    count = 0
     try:
-        stats = index.describe_index_stats()
-        if stats['total_vector_count'] == 0:
-            batch_size = 50 
-            current_batch = []
-            count = 0
-            for tweet_data in tweet_generator():
-                current_batch.append({
-                    "id": f"tweet_{count}",
-                    "metadata": {
-                        "text": tweet_data["text"],
-                        "date": tweet_data["date"]
-                    }
-                })
-                count += 1
-                if len(current_batch) >= batch_size:
-                    index.upsert(vectors=current_batch)
-                    current_batch = []
-            if current_batch:
+        batch_size = 50 
+        current_batch = []
+        print("Starting manual ingestion...")
+        
+        for tweet_data in tweet_generator():
+            current_batch.append({
+                "id": f"tweet_{count}",
+                "metadata": {
+                    "text": tweet_data["text"],
+                    "date": tweet_data["date"]
+                }
+            })
+            count += 1
+            if len(current_batch) >= batch_size:
                 index.upsert(vectors=current_batch)
-    except Exception:
-        pass
+                current_batch = []
+                print(f"Uploaded {count} tweets...")
+
+        if current_batch:
+            index.upsert(vectors=current_batch)
+            
+        return {"status": "success", "tweets_uploaded": count}
+    except Exception as e:
+        print(f"Ingestion Error: {e}")
+        return {"status": "failed", "error": str(e)}
 
 @app.post("/search")
 async def search(request: QueryRequest):
