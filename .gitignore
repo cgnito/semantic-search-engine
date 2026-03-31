@@ -1,3 +1,19 @@
-.venv/
-*.csv
-wandb/
+# Python
+backend/__pycache__/
+backend/.venv/
+backend/.env
+
+# Databases (Local)
+backend/chroma_db/
+
+# Data Files (Keep these local)
+backend/tweets.json
+
+# Next.js
+frontend/.next/
+frontend/node_modules/
+frontend/.env.local
+
+# OS Files
+.DS_Store
+Thumbs.db

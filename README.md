@@ -1,67 +1,127 @@
-# 🐦 abdulrahmon's tweet semantic search engine
+# 🐦 abdurahmon's tweet semantic search engine (v1.0)
 
-this engine implements a vector-based retrieval system that performs asymmetric semantic search across a local twitter archive using sentence-level embeddings. unlike traditional inverted-index keyword searches, this system utilizes a transformer-based encoder to map tweets and queries into a shared 384-dimensional dense vector space, enabling discovery based on latent topical similarity and intent.
+a high-performance retrieval system that performs asymmetric semantic search across a twitter archive. instead of basic keyword matching, this system uses pinecone's serverless vector database and integrated embeddings to map tweets and queries into a shared 384-dimensional dense vector space, enabling discovery based on latent topical similarity and intent.
 
-### what it does (simply put)
+## what it does (simply put)
 
-most search engines just match words. this app uses **machine learning** to convert tweets into numerical "embeddings." when you search for a concept like "productivity," the system calculates which tweets are mathematically closest to that idea, even if they don't contain the specific word "productivity."
+most search engines match exact strings. this application uses machine learning embeddings to represent the "idea" of a tweet as a set of coordinates (vectors). when you search for "productivity", the system calculates which tweets are mathematically closest to that concept via pinecone, even if the specific word "productivity" never appears in the text.
 
-### the stack
+## the stack
 
-- **ui framework:** streamlit for an interactive, reactive python web interface.
+- **backend:** fastapi (python 3.12) - high-performance asynchronous api  
+- **frontend:** next.js 15 + tailwind css - modern, responsive search interface  
+- **vector database:** pinecone - serverless cloud vector storage and metadata retrieval  
+- **model:** all-minilm-l6-v2 (sbert) - high-quality semantic mapping with low latency 
+- **data processing:** ijson - memory-efficient json streaming for large archives  
 
-- **vector database:** chromadb for persistent storage and fast nearest-neighbor (knn) lookups.
+## how it works
 
-- **embedding model:** `all-minilm-l6-v2` via sentence-transformers (sbert), providing high-quality semantic mapping at low latency.
+- **memory-efficient ingestion:** streams your local `tweets.json` using a python generator, handling large archives without memory issues  
+- **cloud vectorization:** uses pinecone's integrated embedding pipeline to convert tweet text into vectors automatically during upsert  
+- **serverless storage:** stores embeddings and tweet metadata in a pinecone index for fast, scalable retrieval  
+- **semantic retrieval:** converts user queries into vectors and performs cosine similarity search to return the top 10 most relevant matches  
 
-- **data processing:** ijson for iterative json parsing to handle large archives with minimal memory overhead.
+## project structure & data handling
 
-### how it works
+**important:** to protect privacy and stay within github file limits, the raw data and environment keys are not included in the repository.
 
-1. memory-efficient ingestion: the app streams the `tweets.json` archive using a generator, ensuring the system doesn't crash regardless of archive size.
+```plaintext
+semantic-search-engine/
+├── backend/
+│   ├── main.py            # fastapi server logic & pinecone integration
+│   ├── requirements.txt   # python dependencies
+│   ├── .env               # [local only] pinecone api keys
+│   └── tweets.json        # [local only] your personal twitter archive
+├── frontend/
+│   ├── src/app/           # next.js application router
+│   └── src/lib/api.ts     # frontend api client
+└── .gitignore             # ignores .venv, .env, and tweets.json
+```
 
-2. vectorization: tweets are processed in batches of 256. the sbert model encodes each tweet into a vector representing its semantic meaning.
+## setup & installation
 
-3. local storage: chromadb stores the document text, date metadata, and the high-dimensional vectors.
-
-4. semantic retrieval: user queries are encoded on-the-fly, and a cosine similarity search is performed against the database to find the top 10 most relevant matches.
-
-5. sqlite compatibility: uses a `pysqlite3` injection to ensure compatibility with modern chromadb requirements in various environments.
-
-### setup & installation
+### 1. clone & configure
 
 ```bash
-# clone the repository
 git clone https://github.com/cgnito/semantic-search-engine.git
 cd semantic-search-engine
 ```
 
-```bash
-#create a virtual environment
-python -m venv venv
-source venv/bin/activate  # on windows: venv\scripts\activate
+### 2. pinecone setup
+
+create a free account at pinecone.io.
+
+- create a new index named `tweet-index`
+- SELECT CUSTOM
+- set dimensions to `384` and metric to `cosine`
+- index Name: tweet-index, dimensions: 384, metric: cosine, capacity code: serverless
+
+copy your api key into a `.env` file inside the `backend/` folder:
+
+```env
+PINECONE_API_KEY=your_key_here
 ```
 
+### 3. backend setup
+
+place your `tweets.json` (exported from twitter) inside the `backend/` folder.
+
+initialize the environment:
+
 ```bash
-# install dependencies
+cd backend
+python -m venv .venv
+source .venv/Scripts/activate  # windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
+start the api:
+
 ```bash
-# run the app
-streamlit run eng.py
+uvicorn main:app --reload
 ```
 
-### future improvements
+the first run will stream your `tweets.json` and upsert the embeddings to your pinecone cloud index.
 
-- better ui: transition to a more polished, custom-branded interface.
+### 4. frontend setup
 
-- api-based embeddings: moving to cloud-hosted embedding apis for higher dimensionality and improved retrieval quality.
+create a `.env.local` file inside the `frontend/` folder:
+```env
+NEXT_PUBLIC_API_URL=http://127.0.0.1:8000
+```
 
-- proper top-k search tuning: refining retrieval parameters for better precision and recall.
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-- live tweet indexing: replacing the static json archive with real-time x api integration.
+## api reference
 
----
+### search tweets
 
-this is just an mvp of a bigger idea... more soon.
+**endpoint:** `POST /search`
+
+**request body:**
+
+```json
+{
+  "query": "startup growth tips"
+}
+```
+
+**successful response:**
+
+```json
+[
+  {
+    "text": "the hardest part of a startup is the first 10 customers...",
+    "date": "wed oct 12 14:20:01 +0000 2022"
+  }
+]
+```
+
+## future improvements
+
+- footprint analysis: automatic flagging of "risky" historical tweets for digital footprint cleanup  
+- hybrid search: combining bm25 keyword ranking with semantic search for perfect precision  
