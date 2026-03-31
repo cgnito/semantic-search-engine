@@ -20,6 +20,7 @@ most search engines match exact strings. this application uses machine learning 
 - **cloud vectorization:** uses pinecone's integrated embedding pipeline to convert tweet text into vectors automatically during upsert.
 - **serverless storage:** stores embeddings and tweet metadata in a pinecone index for fast, scalable retrieval.
 - **semantic retrieval:** converts user queries into vectors in the cloud and performs cosine similarity search to return the top 10 most relevant matches.
+- The system utilizes Pinecone Integrated Inference via the llama-text-embed-v2 model, offloading all embedding generation to the cloud. This architectural decision ensures the backend remains lightweight and responsive on resource-constrained environments by eliminating the need for local vectorization libraries and heavy machine learning models. Additionally, a dedicated ingestion synchronization endpoint was implemented to manage high-volume data migration, ensuring stable uploads that bypass standard serverless startup timeouts.
 
 ## project structure & data handling
 

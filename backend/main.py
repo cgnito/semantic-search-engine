@@ -16,7 +16,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize Pinecone
 api_key = os.getenv("PINECONE_API_KEY")
 pc = Pinecone(api_key=api_key)
 index_name = "tweet-index"
@@ -43,7 +42,6 @@ def health_check():
 
 @app.get("/force-ingest")
 async def force_ingest():
-    """Manual trigger to upload tweets if the startup event failed."""
     count = 0
     try:
         batch_size = 50 
