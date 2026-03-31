@@ -1,7 +1,6 @@
-fastapi
-uvicorn[standard]
-pydantic
+fastapi[standard]
+uvicorn
 pinecone
-ijson
+pydantic
 python-dotenv
-sentence-transformers
+ijson

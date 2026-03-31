@@ -5,7 +5,6 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from pinecone import Pinecone
-from sentence_transformers import SentenceTransformer
 
 load_dotenv()
 app = FastAPI()
@@ -17,20 +16,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-#initialize Pinecone
-pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
+# Initialize Pinecone
+api_key = os.getenv("PINECONE_API_KEY")
+pc = Pinecone(api_key=api_key)
 index_name = "tweet-index"
 index = pc.Index(index_name)
-
-model = SentenceTransformer("all-MiniLM-L6-v2")
 
 class QueryRequest(BaseModel):
     query: str
 
 def tweet_generator():
-    if not os.path.exists("tweets.json"):
+    file_path = "tweets.json"
+    if not os.path.exists(file_path):
         return
-    with open("tweets.json", "r", encoding="utf-8") as f:
+    with open(file_path, "r", encoding="utf-8") as f:
         for record in ijson.items(f, "item"):
             yield {
                 "text": record["tweet"]["full_text"],
@@ -42,16 +41,12 @@ async def startup_event():
     try:
         stats = index.describe_index_stats()
         if stats['total_vector_count'] == 0:
-            batch_size = 100 
+            batch_size = 50 
             current_batch = []
             count = 0
-
             for tweet_data in tweet_generator():
-                tweet_id = f"tweet_{count}"
-                vector = model.encode(tweet_data["text"]).tolist()
                 current_batch.append({
-                    "id": tweet_id,
-                    "values": vector,
+                    "id": f"tweet_{count}",
                     "metadata": {
                         "text": tweet_data["text"],
                         "date": tweet_data["date"]
@@ -61,19 +56,17 @@ async def startup_event():
                 if len(current_batch) >= batch_size:
                     index.upsert(vectors=current_batch)
                     current_batch = []
-
             if current_batch:
                 index.upsert(vectors=current_batch)
-    except Exception as e:
+    except Exception:
         pass
 
 @app.post("/search")
 async def search(request: QueryRequest):
-    query_vector = model.encode(request.query).tolist()
     results = index.query(
-        vector=query_vector, 
-        top_k=10, 
-        include_metadata=True
+        top_k=10,
+        include_metadata=True,
+        inputs={"text": request.query} 
     )
     
     return [
